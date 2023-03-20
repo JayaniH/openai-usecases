@@ -1,4 +1,5 @@
 import logging
+
 import openai
 
 from question_answering_service.constants import EMBEDDING_MODEL
@@ -9,11 +10,10 @@ def count_tokens(text, tokenizer):
 
 
 def get_embedding(text):
-
     try:
         result = openai.Embedding.create(
-          model=EMBEDDING_MODEL,
-          input=text
+            model=EMBEDDING_MODEL,
+            input=text
         )
         return result["data"][0]["embedding"]
 

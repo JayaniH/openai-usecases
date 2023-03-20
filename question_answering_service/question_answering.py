@@ -1,9 +1,9 @@
 import logging
+
 import numpy as np
 import openai
-
-from flask import request
 from flask import current_app as app
+from flask import request
 
 from question_answering_service import document_embeddings, documents, tokenizer
 from question_answering_service.constants import COMPLETIONS_API_PARAMS, MAX_SECTION_LEN, SEPARATOR, SEPARATOR_LEN
@@ -43,7 +43,6 @@ def get_document_similarity(query):
 
 
 def construct_prompt(question) -> str:
-
     most_relevant_document_sections = get_document_similarity(question)
 
     chosen_sections = []
