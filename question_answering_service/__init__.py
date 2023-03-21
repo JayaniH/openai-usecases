@@ -1,8 +1,8 @@
-import gspread
-import openai
 import logging
 import os
 
+import gspread
+import openai
 from flask import Flask
 from google.oauth2.credentials import Credentials
 from transformers import GPT2TokenizerFast
@@ -40,7 +40,6 @@ def create_app():
 
     logging.info("Reading documents from google sheet")
     data = read_documents(gsclient, "1h0WX6lo_aCtnAo1dftVtFqR4CqFWzY-0kT2ZWfCSrWg", "Sheet1")
-    print(data)
 
     for item in data:
         documents[item['heading']] = item['content']
