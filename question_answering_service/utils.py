@@ -23,15 +23,11 @@ def get_embedding(text):
 
 # function to read the data from the google sheet
 def read_documents(gsclient, sheet_id, sheet_name):
-    if gsclient:
-        try:
-            sheet = gsclient.open_by_key(sheet_id)
-            sheet = sheet.worksheet(sheet_name)
-            data = sheet.get_all_records()
-            return data
+    try:
+        sheet = gsclient.open_by_key(sheet_id)
+        sheet = sheet.worksheet(sheet_name)
+        data = sheet.get_all_records()
+        return data
 
-        except Exception as e:
-            logging.error("Error reading documents from google sheet: " + str(e), exc_info=True)
-
-    else:
-        logging.error("Google sheet client not initialized", exc_info=True)
+    except Exception as e:
+        logging.error("Error reading documents from google sheet: " + str(e), exc_info=True)
