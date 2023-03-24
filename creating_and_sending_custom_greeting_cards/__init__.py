@@ -1,5 +1,6 @@
 import logging
 import os
+import sys
 
 import openai
 from flask import Flask
@@ -24,7 +25,7 @@ def create_app():
 
     except Exception as e:
         logging.error("Error authorizing gmail client : " + str(e), exc_info=True)
-        email_client = None
+        sys.exit(1)
 
     app = Flask(__name__)
 

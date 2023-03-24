@@ -1,5 +1,6 @@
 import logging
 import os
+import sys
 
 import gspread
 import openai
@@ -31,19 +32,25 @@ def create_app():
             "client_secret": os.getenv("CLIENT_SECRET"),
             "refresh_token": os.getenv("REFRESH_TOKEN"),
         })
-
         gsclient = gspread.authorize(credentials)
 
     except Exception as e:
         logging.error("Error authorizing google sheets client : " + str(e), exc_info=True)
-        gsclient = None
+        sys.exit(1)
 
     logging.info("Reading documents from google sheet")
-    data = read_documents(gsclient, "1h0WX6lo_aCtnAo1dftVtFqR4CqFWzY-0kT2ZWfCSrWg", "Sheet1")
+    try:
+        data = read_documents(gsclient, os.getenv("SHEET_ID"), os.getenv("SHEET_NAME"))
 
-    for item in data:
-        documents[item['heading']] = item['content']
-        document_embeddings[item['heading']] = get_embedding(item['content'])
+        for item in data:
+            content_embedding = get_embedding(item['content'])
+            documents[item['heading']] = item['content']
+            document_embeddings[item['heading']] = content_embedding
+
+    except Exception as e:
+        logging.error("Error reading documents from google sheet : " + str(e), exc_info=True)
+        sys.exit(1)
+
     app = Flask(__name__)
 
     with app.app_context():
