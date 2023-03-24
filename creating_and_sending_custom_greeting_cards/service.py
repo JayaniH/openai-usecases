@@ -36,11 +36,11 @@ def create_and_send_greeting():
             greeting = greeting_thread.result()
             image_url = design_thread.result()
 
-            if greeting is None or image_url is None:
-                return "ERROR: There was an error generating greeting or design.", HTTP_500_INTERNAL_SERVER_ERROR
+        if greeting is None or image_url is None:
+            return "ERROR: There was an error generating greeting or design.", HTTP_500_INTERNAL_SERVER_ERROR
 
-            send_email(greeting, image_url, recipient_email, email_subject)
-            return "Successfully created and sent greeting."
+        send_email(greeting, image_url, recipient_email, email_subject)
+        return "Successfully created and sent greeting."
 
     except Exception as e:
         logging.error("Error creating and sending greeting: " + str(e), exc_info=True)
