@@ -6,7 +6,8 @@ from flask import current_app as app
 from flask import request
 
 from question_answering_service import document_embeddings, documents, tokenizer
-from question_answering_service.constants import COMPLETIONS_API_PARAMS, MAX_SECTION_LEN, SEPARATOR, SEPARATOR_LEN
+from question_answering_service.constants import COMPLETIONS_API_PARAMS, MAX_SECTION_LEN, SEPARATOR, SEPARATOR_LEN, \
+    HTTP_500_INTERNAL_SERVER_ERROR
 from question_answering_service.utils import get_embedding, count_tokens
 
 
@@ -19,26 +20,27 @@ def generate_answer():
             prompt=prompt,
             **COMPLETIONS_API_PARAMS
         )
-        answer = response["choices"][0]["text"].strip(" \n")
+        answer = response['choices'][0]['text'].strip(" \n")
         return answer
 
     except Exception as e:
         logging.error("Error generating answer: " + str(e), exc_info=True)
-        return "", 500
+        return "ERROR: There was an error generating the answer.", HTTP_500_INTERNAL_SERVER_ERROR
 
 
 def get_document_similarity(query):
-    query_embedding = get_embedding(query)
+    try:
+        query_embedding = get_embedding(query)
 
-    if not query_embedding:
-        return
+        document_similarities = sorted([
+            (np.dot(np.array(query_embedding), np.array(doc_embedding)), doc_index) for doc_index, doc_embedding in
+            document_embeddings.items()
+        ], reverse=True)
 
-    document_similarities = sorted([
-        (np.dot(np.array(query_embedding), np.array(doc_embedding)), doc_index) for doc_index, doc_embedding in
-        document_embeddings.items()
-    ], reverse=True)
+        return document_similarities
 
-    return document_similarities
+    except Exception as e:
+        logging.error("Error computing document similarity: " + str(e), exc_info=True)
 
 
 def construct_prompt(question):

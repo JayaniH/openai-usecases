@@ -39,19 +39,17 @@ def create_app():
         sys.exit(1)
 
     logging.info("Reading documents from google sheet")
-    data = read_documents(gsclient, os.getenv("SHEET_ID"), os.getenv("SHEET_NAME"))
+    try:
+        data = read_documents(gsclient, os.getenv("SHEET_ID"), os.getenv("SHEET_NAME"))
 
-    if not data:
+        for item in data:
+            content_embedding = get_embedding(item['content'])
+            documents[item['heading']] = item['content']
+            document_embeddings[item['heading']] = content_embedding
+
+    except Exception as e:
+        logging.error("Error reading documents from google sheet : " + str(e), exc_info=True)
         sys.exit(1)
-
-    for item in data:
-        content_embedding = get_embedding(item['content'])
-
-        if not content_embedding:
-            sys.exit(1)
-
-        documents[item['heading']] = item['content']
-        document_embeddings[item['heading']] = content_embedding
 
     app = Flask(__name__)
 
